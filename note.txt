@@ -52,5 +52,10 @@ CLI
 node version 18.20.2
 npm install -g @angular/cli@16.1.6
 ng new client
+ng s --o
+ng add ngx-bootstrap: to install ngx bootstrap
+npm install font-awesome
+mkdir ssl: to create folder into client
+mkcert --install: add ssl certificate
 
 
