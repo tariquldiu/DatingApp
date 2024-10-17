@@ -1,25 +1,33 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Carousel</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarCollapse">
-        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+    <div class="container">
+      <a class="navbar-brand">Dating App</a>
+     
+        <ul  *ngIf="accountService.currentUser()" class="navbar-nav me-auto mb-2 mb-md-0">
           <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="#">Home</a>
+            <a class="nav-link">Matches</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
+            <a class="nav-link">Lists</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+            <a class="nav-link">Message</a>
           </li>
+        
         </ul>
-        <form class="d-flex" role="search">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
+     <div *ngIf="accountService.currentUser()" dropdown class="dropdown">
+      <a dropdownToggle class="dropdown-toggle text-light text-decoration-none">Welcome user</a>
+      <div *dropdownMenu class="dropdown-menu">
+        <a class="dropdown-item">Edit Profile</a>
+        <div class="dropdown-divider"></div>
+        <a class="dropdown-item" (click)="logOut()">Logout</a>
+      </div>
+
+     </div>
+    
+        <form *ngIf="!accountService.currentUser()" #loginForm="ngForm" class="d-flex" (ngSubmit)="login()" autocomplete="off">
+          <input class="form-control me-2" [(ngModel)]="model.username" placeholder="Username" [ngModelOptions]="{ standalone: true }">
+          <input class="form-control me-2" [(ngModel)]="model.password" type="password" placeholder="Password" [ngModelOptions]="{ standalone: true }">
+          <button class="btn btn-outline-success" type="submit">Login</button>
         </form>
       </div>
-    </div>
   </nav>
