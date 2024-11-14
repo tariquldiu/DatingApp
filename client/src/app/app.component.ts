@@ -2,8 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavComponent } from './nav/nav.component';
-import { CommonModule, NgIf } from '@angular/common';
-import { HomeComponent } from './home/home.component';
+import { CommonModule } from '@angular/common';
 import { AccountService } from './_services/account.service';
 
 @Component({
@@ -11,7 +10,7 @@ import { AccountService } from './_services/account.service';
   standalone: true,
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  imports:[RouterOutlet,CommonModule,NgIf, NavComponent, HomeComponent ]
+  imports:[RouterOutlet,CommonModule, NavComponent ]
 })
 export class AppComponent {
   http = inject(HttpClient);
