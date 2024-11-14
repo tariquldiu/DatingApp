@@ -42,7 +42,7 @@
                 <p>{{member?.interests}}</p>
             </tab>
             <tab heading="Photos">
-                <!-- <gallery [items]="images" class="gallery"></gallery> -->
+                <ng-image-slider [images]="imageObject" #nav></ng-image-slider>
             </tab>
             <tab heading="Messages">
                 <p>Messages will go here</p>
