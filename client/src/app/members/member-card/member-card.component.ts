@@ -1,3 +1,4 @@
+import { NgFor } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Member } from 'src/app/_models/member';

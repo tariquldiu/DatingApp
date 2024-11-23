@@ -4,12 +4,13 @@ import { MemberService } from 'src/app/_services/member.service';
 import { Member } from 'src/app/_models/member';
 import { ActivatedRoute } from '@angular/router';
 import { NgImageSliderModule } from 'ng-image-slider';
+import { NgIf } from '@angular/common';
 
 
 @Component({
   selector: 'app-member-detail',
   standalone: true,
-  imports: [TabsModule, NgImageSliderModule],
+  imports: [TabsModule, NgImageSliderModule, NgIf],
   templateUrl: './member-detail.component.html',
   styleUrls: ['./member-detail.component.css']
 })

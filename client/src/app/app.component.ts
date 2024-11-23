@@ -4,13 +4,14 @@ import { RouterOutlet } from '@angular/router';
 import { NavComponent } from './nav/nav.component';
 import { CommonModule } from '@angular/common';
 import { AccountService } from './_services/account.service';
+import { NgxSpinnerComponent } from 'ngx-spinner';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  imports:[RouterOutlet,CommonModule, NavComponent ]
+  imports:[RouterOutlet,CommonModule, NavComponent, NgxSpinnerComponent ]
 })
 export class AppComponent {
   http = inject(HttpClient);
