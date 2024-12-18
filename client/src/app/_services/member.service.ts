@@ -10,9 +10,12 @@ import { Member } from '../_models/member';
 export class MemberService {
   private http=inject(HttpClient);
   baseUrl =environment.apiUrl;
+  members = signal<Member[]>([]);
   
   getMembers(){
-    return this.http.get<Member[]>(this.baseUrl + 'users');
+    return this.http.get<Member[]>(this.baseUrl + 'users').subscribe({
+      next: members=> this.members.set(members)
+    })
   }
 
   getMember(username: string){

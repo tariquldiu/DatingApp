@@ -1,5 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { NgFor } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
+import { NgFor, NgIf } from '@angular/common';
 import { MemberService } from 'src/app/_services/member.service';
 import { Member } from 'src/app/_models/member';
 import { MemberCardComponent } from '../member-card/member-card.component';
@@ -7,21 +7,19 @@ import { MemberCardComponent } from '../member-card/member-card.component';
 @Component({
   selector: 'app-member-list',
   standalone: true,
-  imports: [MemberCardComponent],
+  imports: [MemberCardComponent,NgFor],
   templateUrl: './member-list.component.html',
   styleUrls: ['./member-list.component.css']
 })
-export class MemberListComponent {
-private memberService = inject(MemberService)
-members: Member[] = [];
+export class MemberListComponent implements OnInit{
+ memberService = inject(MemberService)
 
  ngOnInit():void{
-  this.loadMembers();
+  if(this.memberService.members().length === 0) this.loadMembers();
  }
 
  loadMembers(){
-   this.memberService.getMembers().subscribe({
-    next: members => this.members = members
-  });
+  this.memberService.getMembers();
  }
+
 }
