@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, CUSTOM_ELEMENTS_SCHEMA, HostListener, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, NgIf } from '@angular/common';
 import { AccountService } from 'src/app/_services/account.service';
 import { MemberService } from 'src/app/_services/member.service';
@@ -6,13 +6,15 @@ import { Member } from 'src/app/_models/member';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { PhotoEditorComponent } from "../photo-editor/photo-editor.component";
 
 @Component({
   selector: 'app-member-edit',
   standalone: true,
-  imports: [CommonModule, TabsModule, NgIf, FormsModule],
+  imports: [CommonModule, TabsModule, NgIf, FormsModule, PhotoEditorComponent],
   templateUrl: './member-edit.component.html',
-  styleUrls: ['./member-edit.component.css']
+  styleUrls: ['./member-edit.component.css'],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class MemberEditComponent implements OnInit{
   @ViewChild('editForm') editForm? :NgForm
