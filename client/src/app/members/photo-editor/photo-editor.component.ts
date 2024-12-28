@@ -4,6 +4,8 @@ import { Member } from 'src/app/_models/member';
 import { FileUploader, FileUploadModule } from 'ng2-file-upload';
 import { environment } from 'src/environments/environment';
 import { AccountService } from 'src/app/_services/account.service';
+import { Photo } from 'src/app/_models/photo';
+import { MemberService } from 'src/app/_services/member.service';
 
 @Component({
   selector: 'app-photo-editor',
@@ -14,6 +16,7 @@ import { AccountService } from 'src/app/_services/account.service';
 })
 export class PhotoEditorComponent implements OnInit{
   private accountService = inject(AccountService);
+  private memberService = inject(MemberService);
   @Input() member!: Member; 
   @Output() memberChange = new EventEmitter<Member>(); 
   uploader?: FileUploader
@@ -26,6 +29,36 @@ export class PhotoEditorComponent implements OnInit{
 
   fileOverBase(e: any){
    this.hasBaseDropZoneOver = e;
+  }
+
+  deletePhoto(photo: Photo){
+    this.memberService.deletePhoto(photo).subscribe({
+      next: _ =>{
+        const updatedMember = {...this.member};
+        updatedMember.photos = updatedMember.photos.filter(x=>x.id === photo.id)
+        this.memberChange.emit(updatedMember);
+      }
+    })
+  }
+
+  setMainPhoto(photo: Photo){
+    this.memberService.setMainPhoto(photo).subscribe({
+      next: _ => {
+        const user = this.accountService.currentUser();
+        if(user){
+          user.photoUrl = photo.url;
+          this.accountService.setCurrentUser(user);
+        }
+        const updatedMember = {...this.member}
+        updatedMember.photoUrl = photo.url;
+
+        updatedMember.photos.forEach(p => {
+          if(p.isMain) p.isMain = false;
+          if(p.id === photo.id) p.isMain = true;
+        });
+          this.memberChange.emit(updatedMember);
+      }
+    })
   }
 
   initializeUploader(){
@@ -42,7 +75,7 @@ export class PhotoEditorComponent implements OnInit{
 
 
     this.uploader.onAfterAddingFile = (file) =>{
-      file.withCredentials = true;
+      file.withCredentials = false;
     }
 
     this.uploader.onSuccessItem = (item, response, status, header) =>{

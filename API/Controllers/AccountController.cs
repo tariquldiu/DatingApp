@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using API.Data;
 using API.DTOs;
 using API.Entities;
+using API.Extensions;
 using API.Interfaces;
+using API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,10 +17,12 @@ namespace API.Controllers
 {
     public class AccountController: BaseApiController
     {
+         private readonly IUserRepository _userRepository;
         private readonly DataContext _dataContext;
         private readonly ITokenService _tokenService;
-        public AccountController(DataContext dataContext, ITokenService tokenService)
+        public AccountController(DataContext dataContext, ITokenService tokenService, IUserRepository userRepository)
         {
+            _userRepository = userRepository;
             _dataContext = dataContext;
             _tokenService = tokenService;
         }
@@ -44,7 +48,9 @@ namespace API.Controllers
         }
         [HttpPost("login")]
         public async Task<ActionResult<UserDto>> Login(LoginDto loginDto){
-            var user = await _dataContext.Users.SingleOrDefaultAsync(x=>x.UserName == loginDto.Username.ToLower());
+            var user = await _dataContext.Users
+                        .Include(p=>p.Photos)
+                        .FirstOrDefaultAsync(x=>x.UserName == loginDto.Username.ToLower());
             if(user == null){
                 return Unauthorized("Username invalid.");
             }
@@ -58,7 +64,8 @@ namespace API.Controllers
             }
             return new UserDto{
                 Username = loginDto.Username.ToLower(),
-                Token =_tokenService.CreateToken(user)
+                Token =_tokenService.CreateToken(user),
+                PhotoUrl = user.Photos.FirstOrDefault()?.Url
             };
         }
 
@@ -66,5 +73,7 @@ namespace API.Controllers
         {
             return await _dataContext.Users.AnyAsync(u => u.UserName == username.ToLower());
         }
+
+      
     }
 }
