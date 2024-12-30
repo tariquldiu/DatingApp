@@ -50,7 +50,6 @@ export class MemberService {
   }
 
   deletePhoto(photo: Photo){
-    debugger
     return this.http.delete(this.baseUrl + 'users/delete-photo/' + photo.id).pipe(
       tap(() => {
         this.members.update(members => members.map(m => {
