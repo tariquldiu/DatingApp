@@ -1,32 +1,43 @@
-import { JsonPipe, NgFor, NgIf } from '@angular/common';
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
-import { AbstractControl, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
+import { NgFor, NgIf } from '@angular/common';
+import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { AccountService } from '../_services/account.service';
-import { ToastrService } from 'ngx-toastr';
+import { TextInputComponent } from '../_forms/text-input/text-input.component';
+import { DatePickerComponent } from '../_forms/date-picker/date-picker.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports:[ReactiveFormsModule, JsonPipe, NgIf],
+  imports:[ReactiveFormsModule,NgIf, NgFor, TextInputComponent, DatePickerComponent],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit{
 
 private accountService = inject(AccountService)
-private toast=inject(ToastrService)
+private fb = inject(FormBuilder)
+private router=inject(Router)
 @Output() cancelRegister =new  EventEmitter();
-model:any={}
 registerForm: FormGroup = new FormGroup({});
+maxDate = new Date();
+validationError: string[] | undefined;
+
   ngOnInit(): void {
     this.initializeForm();
+    this.maxDate.setFullYear(this.maxDate.getFullYear() - 18)
   }
 
   initializeForm(){
-    this.registerForm = new FormGroup({
-      username: new FormControl('Hello', Validators.required),
-      password: new FormControl('', [Validators.required, Validators.minLength(4), Validators.maxLength(8)]),
-      confirmPassword: new FormControl('', [Validators.required, this.matchValues('password')]),
+    this.registerForm = this.fb.group({
+      gender: ['male', Validators.required],
+      knownAs: ['', Validators.required],
+      dateOfBirth: ['', Validators.required],
+      city: ['', Validators.required],
+      country: ['', Validators.required],
+      username: ['', Validators.required],
+      password: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(8)]],
+      confirmPassword: ['', [Validators.required, this.matchValues('password')]],
     })
 
     this.registerForm.controls['password'].valueChanges.subscribe({
@@ -40,18 +51,20 @@ registerForm: FormGroup = new FormGroup({});
     }
   }
   register(){
-
-    console.log(this.registerForm.value)
-    // this.accountService.register(this.model).subscribe({
-    //   next: response=>{
-    //     console.log(response);
-    //     this.cancel();
-    //   },
-    //   error: error => this.toast.error(error.error)
-    // })
+    const dob = this.getDateOnly(this.registerForm.get('dateOfBirth')?.value)
+    this.registerForm.patchValue({dateOfBirth: dob})
+    this.accountService.register(this.registerForm.value).subscribe({
+      next: _ => this.router.navigateByUrl('/members'),
+      error: error => this.validationError = error
+    })
   }
 
   cancel(){
     this.cancelRegister.emit(false);
+  }
+  getDateOnly(dob: string | undefined){
+    if(!dob) return;
+
+    return new Date(dob).toISOString().slice(0,10);
   }
 }

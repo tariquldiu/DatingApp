@@ -69,6 +69,7 @@ public class UsersController: BaseApiController
             publicId = result.PublicId
         };
 
+        if(user.Photos.Count == 0) photo.IsMain = true;
         user.Photos.Add(photo);
         if(await _userRepository.SaveAllAsync()) {
             return CreatedAtAction(nameof(GetUser), new{username = user.UserName}, _mapper.Map<PhotoDto>(photo));

@@ -10,6 +10,7 @@ using API.Entities;
 using API.Extensions;
 using API.Interfaces;
 using API.Services;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,30 +21,32 @@ namespace API.Controllers
          private readonly IUserRepository _userRepository;
         private readonly DataContext _dataContext;
         private readonly ITokenService _tokenService;
-        public AccountController(DataContext dataContext, ITokenService tokenService, IUserRepository userRepository)
+        private readonly IMapper _mapper;
+        public AccountController(DataContext dataContext, ITokenService tokenService, IMapper mapper, IUserRepository userRepository)
         {
             _userRepository = userRepository;
             _dataContext = dataContext;
             _tokenService = tokenService;
+            _mapper = mapper;
         }
 
         [HttpPost("register")]
         public async Task<ActionResult<UserDto>> Register([FromBody]RegisterDto register)
         {
-             var hash = new HMACSHA512();
             if(await UserExist(register.Username)) return BadRequest("Username is taken");
-             var user = new AppUser{
-                UserName = register.Username.ToLower(),
-                PasswordSalt = hash.Key,
-                PasswordHash = hash.ComputeHash(Encoding.UTF8.GetBytes(register.Password))
-               
-             };
-            
+
+             var hash = new HMACSHA512();
+             var user = _mapper.Map<AppUser>(register);
+             user.UserName = register.Username.ToLower();
+             user.PasswordHash =hash.ComputeHash(Encoding.UTF8.GetBytes(register.Password));
+             user.PasswordSalt = hash.Key;
+
             _dataContext.Users.Add(user);
             await _dataContext.SaveChangesAsync();
              return new UserDto{
-                Username = register.Username.ToLower(),
-                Token =_tokenService.CreateToken(user)
+                Username = user.UserName,
+                Token =_tokenService.CreateToken(user),
+                KnownAs = user.KnownAs
             };
         }
         [HttpPost("login")]
@@ -63,7 +66,8 @@ namespace API.Controllers
                 }
             }
             return new UserDto{
-                Username = loginDto.Username.ToLower(),
+                Username = user.UserName,
+                KnownAs = user.KnownAs,
                 Token =_tokenService.CreateToken(user),
                 PhotoUrl = user.Photos.FirstOrDefault()?.Url
             };
