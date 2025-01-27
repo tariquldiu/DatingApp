@@ -4,13 +4,14 @@ import { MemberService } from 'src/app/_services/member.service';
 import { Member } from 'src/app/_models/member';
 import { ActivatedRoute } from '@angular/router';
 import { NgImageSliderModule } from 'ng-image-slider';
-import { NgIf } from '@angular/common';
+import { DatePipe, NgIf } from '@angular/common';
+import { TimeagoModule } from 'ngx-timeago';
 
 
 @Component({
   selector: 'app-member-detail',
   standalone: true,
-  imports: [TabsModule, NgImageSliderModule, NgIf],
+  imports: [TabsModule, NgImageSliderModule, NgIf, TimeagoModule, DatePipe],
   templateUrl: './member-detail.component.html',
   styleUrls: ['./member-detail.component.css']
 })
