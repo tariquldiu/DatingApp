@@ -1,16 +1,16 @@
 import { HttpClient } from '@angular/common/http';
-import {Injectable, signal } from '@angular/core';
+import {inject, Injectable, signal } from '@angular/core';
 import {User} from '../_models/user';
 import { map } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { LikesService } from './likes.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
-
-constructor(private http : HttpClient) {}
-
+  private http = inject(HttpClient);
+  private likeService = inject(LikesService);
   baseUrl = environment.apiUrl;
   currentUser = signal<User | null>(null)
   
@@ -39,6 +39,7 @@ constructor(private http : HttpClient) {}
   setCurrentUser(user: User){
     localStorage.setItem('user', JSON.stringify(user));
     this.currentUser.set(user);
+    this.likeService.getLikeIds();
   }
   logout(){
    localStorage.removeItem('user');
