@@ -1,13 +1,49 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnDestroy } from '@angular/core';
+import { NgFor, NgIf } from '@angular/common';
+import { LikesService } from '../_services/likes.service';
+import { ButtonsModule } from 'ngx-bootstrap/buttons';
+import { FormsModule } from '@angular/forms';
+import { MemberCardComponent } from '../members/member-card/member-card.component';
+import { PaginationModule } from 'ngx-bootstrap/pagination';
 
 @Component({
   selector: 'app-lists',
   standalone: true,
-  imports: [CommonModule],
+  imports: [MemberCardComponent,ButtonsModule, FormsModule,NgFor, NgIf, PaginationModule],
   templateUrl: './lists.component.html',
   styleUrls: ['./lists.component.css']
 })
-export class ListsComponent {
+export class ListsComponent implements OnDestroy{
 
+  likesService = inject(LikesService);
+  predicate = 'liked';
+  pageNumber =1;
+  pageSize = 5;
+
+  ngOnInit(): void{
+    this.loadLikes();
+  }
+
+  getTitle(){
+    switch(this.predicate){
+      case 'liked': return 'Members you like';
+      case 'likedBy': return 'Members who like you';
+      default: return 'Mutual'
+    }
+  }
+
+  loadLikes(){
+    this.likesService.getLikes(this.predicate, this.pageNumber, this.pageSize);
+  }
+
+  pageChanged(event: any){
+    if(this.pageNumber !== event.page){
+      this.pageNumber = event.page;
+      this.loadLikes();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.likesService.paginatedResult.set(null);
+  }
 }
