@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
-    public class MessageRepository(DataContext context, Mapper mapper) : IMessageRepository
+    public class MessageRepository(DataContext context, IMapper mapper) : IMessageRepository
     {
         public void AddMessage(Message message)
         {

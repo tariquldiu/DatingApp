@@ -43,7 +43,7 @@ namespace API.Controllers
             return BadRequest("Failed to save message");
         }
 
-        [HttpGet]
+        [HttpGet("get-message-for-user")]
         public async Task<ActionResult<IEnumerable<MessageDto>>> GetMessageForUser([FromQuery]MessageParams messageParams){
 
             messageParams.UserName = User.GetUserName();
