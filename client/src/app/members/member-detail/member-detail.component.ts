@@ -6,12 +6,13 @@ import { ActivatedRoute } from '@angular/router';
 import { NgImageSliderModule } from 'ng-image-slider';
 import { DatePipe, NgIf } from '@angular/common';
 import { TimeagoModule } from 'ngx-timeago';
+import { MemberMessagesComponent } from '../member-messages/member-messages.component';
 
 
 @Component({
   selector: 'app-member-detail',
   standalone: true,
-  imports: [TabsModule, NgImageSliderModule, NgIf, TimeagoModule, DatePipe],
+  imports: [MemberMessagesComponent, TabsModule, NgImageSliderModule, NgIf, TimeagoModule, DatePipe],
   templateUrl: './member-detail.component.html',
   styleUrls: ['./member-detail.component.css']
 })

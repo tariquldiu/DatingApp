@@ -22,15 +22,15 @@
                                 <th style="width: 20%;"></th>
                         </tr>
                 </thead>
-                <tbody *ngFor="let message of messageService.paginatedResult()?.items">
-                        <tr>
+                <tbody class="aline-middle" *ngFor="let message of messageService.paginatedResult()?.items">
+                        <tr routerLink = "{{getRoute(message)}}">
                                 <td>{{message.content}}</td>
                                 <td>
                                         <div>
                                                <img [src]="container === 'Outbox'
                                                ? (message.recipientPhotoUrl || './asset/user.png') 
                                                : (message.senderPhotoUrl || './asset/user.png')"
-                                               alt="image of user"
+                                               alt="image of user" class="rounded-circle me-2"
                                                >
 
                                                <strong>{{container === 'Outbox'? message.recipientUsername : message.senderUsername}}</strong>
@@ -43,6 +43,22 @@
         </table>
 </div>
 
-<div *ngFor="let message of messageService.paginatedResult()?.items">
-        <p>{{message.content}}</p>
-</div>
+<div *ngIf="messageService.paginatedResult()?.pagination">
+        <div class="d-flex justify-content-center">
+            <pagination 
+            [boundaryLinks]="true" 
+            [totalItems]="messageService.paginatedResult()?.pagination!.totalItems"
+            [itemsPerPage]="messageService.paginatedResult()?.pagination!.itemsPerPage"
+            (pageChanged) = "pageChanged($event)"
+            [(ngModel)]="messageService.paginatedResult()?.pagination!.currentPage"
+            [maxSize]="10"
+            previousText="&lsaquo;" 
+            nextText="&rsaquo;" 
+            firstText="&laquo;" 
+            lastText="&raquo;">
+         
+        </pagination>
+        </div>
+        
+    </div>
+    
