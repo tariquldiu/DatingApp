@@ -6,14 +6,15 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using API.Entities;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Data
 {
     public static class Seed
     {
-        public static async Task SeedUsers(DataContext context){
-            if(await context.Users.AnyAsync()) return;
+        public static async Task SeedUsers(UserManager<AppUser> userManager){
+            if(await userManager.Users.AnyAsync()) return;
 
             var userData = await File.ReadAllTextAsync("Data/UserSeedData.json");
             var options = new JsonSerializerOptions{PropertyNameCaseInsensitive = true};
@@ -21,14 +22,9 @@ namespace API.Data
 
             foreach (var user in users??new())
             {
-                using var hmac = new HMACSHA512();
-                user.UserName = user.UserName.ToLower();
-                user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes("Pa.1234"));
-                user.PasswordSalt = hmac.Key;
-
-                context.Users.Add(user);
+               user.UserName = user.UserName!.ToLower();
+               await userManager.CreateAsync(user, "Pa@12345");
             }
-            await context.SaveChangesAsync();
         }
     }
 }
