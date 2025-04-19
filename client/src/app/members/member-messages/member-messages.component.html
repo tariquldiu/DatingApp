@@ -1,35 +1,35 @@
 <div class="card">
     <div class="card-body">
-        <div *ngIf="messages.length === 0">
+        <div *ngIf="messageService.messageThread().length === 0">
             <p>No message yet</p>
         </div>
-        <div *ngIf="messages.length >0">
-            <ul class="chat" *ngFor="let message of messages">
-                <li>
-                    <div>
-                        <span class="chat-img float-end">
-                            <img class="rounded-circle" src="{{message.senderPhotoUrl || './asset/user.png'}}" alt="Image of message sender">
-                        </span>
-                        <div class="chat-body">
-                            <div class="header">
-                                <small class="text-muted">
-                                    <span class="fa fa-clock-o">
-                                        {{message.messageSent | timeago}}
-                                    </span>
-                                    <span *ngIf="!message.dateRead && message.senderUsername !== username">
-                                        <span class="text-danger">(Unread)</span>
-                                    </span>
-                                    <span *ngIf="message.dateRead && message.senderUsername !== username">
-                                        <span class="text-success">(read {{message.dateRead | timeago}})</span>
-                                    </span>
-                                </small>
+            <div *ngIf="messageService.messageThread().length > 0">
+                <ul class="chat" *ngFor="let message of messageService.messageThread()">
+                    <li>
+                        <div>
+                            <span class="chat-img float-end">
+                                <img class="rounded-circle" src="{{message.senderPhotoUrl || './asset/user.png'}}" alt="Image of message sender">
+                            </span>
+                            <div class="chat-body">
+                                <div class="header">
+                                    <small class="text-muted">
+                                        <span class="fa fa-clock-o">
+                                            {{message.messageSent | timeago}}
+                                        </span>
+                                        <span *ngIf="!message.dateRead && message.senderUsername !== username">
+                                            <span class="text-danger">(Unread)</span>
+                                        </span>
+                                        <span *ngIf="message.dateRead && message.senderUsername !== username">
+                                            <span class="text-success">(read {{message.dateRead | timeago}})</span>
+                                        </span>
+                                    </small>
+                                </div>
+                                <p>{{message.content}}</p>
                             </div>
-                            <p>{{message.content}}</p>
                         </div>
-                    </div>
-                </li>
-            </ul>
-        </div>
+                    </li>
+                </ul>
+            </div>
     </div>
     <div class="card-footer">
         <form #messageForm = "ngForm" (ngSubmit)="sendMessages()">

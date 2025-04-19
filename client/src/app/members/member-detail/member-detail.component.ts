@@ -1,14 +1,17 @@
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TabDirective, TabsetComponent, TabsModule } from 'ngx-bootstrap/tabs';
 import { MemberService } from 'src/app/_services/member.service';
 import { Member } from 'src/app/_models/member';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NgImageSliderModule } from 'ng-image-slider';
 import { DatePipe, NgIf } from '@angular/common';
 import { TimeagoModule } from 'ngx-timeago';
 import { MemberMessagesComponent } from '../member-messages/member-messages.component';
 import { Message } from 'src/app/_models/message';
 import { MessageService } from 'src/app/_services/message.service';
+import { PresenceService } from 'src/app/_services/presence.service';
+import { AccountService } from 'src/app/_services/account.service';
+import { HubConnectionState } from '@microsoft/signalr';
 
 
 @Component({
@@ -18,20 +21,21 @@ import { MessageService } from 'src/app/_services/message.service';
   templateUrl: './member-detail.component.html',
   styleUrls: ['./member-detail.component.css']
 })
-export class MemberDetailComponent implements OnInit {
+export class MemberDetailComponent implements OnInit, OnDestroy {
 
   @ViewChild('memberTabs', {static: true}) memberTabs?: TabsetComponent
-  private memberService = inject(MemberService);
+  private accountService = inject(AccountService);
   private messageService = inject(MessageService);
-  private route = inject(ActivatedRoute);
+  presenceService = inject(PresenceService);
+  private activatedRoute = inject(ActivatedRoute);
+  private router = inject(Router);
   member:Member ={} as Member;
   imageObject: Array<object> = [];
   activeTab?: TabDirective;
-  messages: Message[] =[];
 
   ngOnInit(){
    
-    this.route.data.subscribe({
+    this.activatedRoute.data.subscribe({
       next: data => {
         this.member = data['member'];
         this.member && this.member.photos.map((p, index) => {
@@ -39,16 +43,16 @@ export class MemberDetailComponent implements OnInit {
         })
       }
     })
+    
+    this.activatedRoute.paramMap.subscribe({
+      next: _=> this.onRouteParamsChange()
+    })
 
-    this.route.queryParams.subscribe({
+    this.activatedRoute.queryParams.subscribe({
       next: params => {
         params['tab'] && this.selectTab(params['tab'])
       }
     })
-  }
-
-  onUpdateMessages(event: Message){
-    this.messages.push(event);
   }
 
   selectTab(heading: string){
@@ -58,18 +62,43 @@ export class MemberDetailComponent implements OnInit {
       }
   }
 
+  onRouteParamsChange(){
+    const user = this.accountService.currentUser();
+    if(!user) return;
+
+    if(this.messageService.hubConnection?.state === HubConnectionState.Connected && this.activeTab?.heading === 'Messages')
+    {
+      this.messageService.hubConnection.stop().then(()=>{
+          this.messageService.createHubConnection(user, this.member.userName)
+      })
+    }
+
+  }
   onTabActivated(data: TabDirective){
     this.activeTab = data;
-    if(this.activeTab.heading === 'Messages' && this.messages.length === 0 && this.member){
-       this.messageService.getMessageThread(this.member.userName).subscribe({
-        next: messages => this.messages = messages
-       })
+    this.router.navigate([],{
+        relativeTo: this.activatedRoute,
+        queryParams: {tab: this.activeTab.heading},
+        queryParamsHandling: 'merge'
+
+    })
+
+    if(this.activeTab.heading === 'Messages' && this.member){
+      const user = this.accountService.currentUser();
+      if(!user) return;
+      this.messageService.createHubConnection(user, this.member.userName);
+    }
+    else{
+      this.messageService.stopHubConnection();
     }
   }
 
+  ngOnDestroy(): void{
+    this.messageService.stopHubConnection();
+  }
   // loadMember()
   // {
-  //   const username = this.route.snapshot.paramMap.get('username');
+  //   const username = this.activatedRoute.snapshot.paramMap.get('username');
   //   if(!username)return;
 
   //   this.memberService.getMember(username).subscribe({

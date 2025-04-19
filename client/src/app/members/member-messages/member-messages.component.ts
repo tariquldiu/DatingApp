@@ -1,7 +1,6 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { CommonModule, NgFor } from '@angular/common';
+import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MessageService } from 'src/app/_services/message.service';
-import { Message } from 'src/app/_models/message';
 import { TimeagoModule } from 'ngx-timeago';
 import { FormsModule, NgForm } from '@angular/forms';
 
@@ -14,10 +13,8 @@ import { FormsModule, NgForm } from '@angular/forms';
 })
 export class MemberMessagesComponent implements OnInit{
   @ViewChild("messageForm") messageForm?: NgForm
-  private messageService = inject(MessageService) 
+  messageService = inject(MessageService) 
   @Input() username!: string;
-  @Input() messages!: Message[];
-  @Output() updateMessages = new EventEmitter<Message>(); 
   messageContent = '';
 
   ngOnInit(){
@@ -26,12 +23,8 @@ export class MemberMessagesComponent implements OnInit{
   }
 
   sendMessages(){
-    this.messageService.sendMessage(this.username, this.messageContent).subscribe({
-      next: message => 
-        {
-          this.updateMessages.emit(message);
-          this.messageForm?.reset();
-        }
+    this.messageService.sendMessage(this.username, this.messageContent).then(() =>{
+      this.messageForm?.reset();
     })
    
   }
