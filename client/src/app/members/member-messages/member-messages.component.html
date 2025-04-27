@@ -3,8 +3,8 @@
         <div *ngIf="messageService.messageThread().length === 0">
             <p>No message yet</p>
         </div>
-            <div *ngIf="messageService.messageThread().length > 0">
-                <ul class="chat" *ngFor="let message of messageService.messageThread()">
+            <div *ngIf="messageService.messageThread().length > 0" class="chat" #scrollMe style="overflow: scroll; max-height: 500px; scroll-behavior: smooth;">
+                <ul  *ngFor="let message of messageService.messageThread()">
                     <li>
                         <div>
                             <span class="chat-img float-end">
