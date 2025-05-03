@@ -44,7 +44,7 @@ namespace API.Data
                     .HasOne(t=>t.TargetUser)
                     .WithMany(l=>l.LikedByUsers)
                     .HasForeignKey(s=>s.TargetUserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<Message>()
                     .HasOne(t=>t.Sender)
